@@ -13,8 +13,10 @@ RUN apt-get update \
 
 RUN ln -sf /usr/bin/python3 /usr/bin/python \
     && python3 -m pip install --no-cache-dir --break-system-packages \
+       --upgrade pip setuptools wheel \
+    && python3 -m pip install --no-cache-dir --break-system-packages \
        apache-flink==${FLINK_VERSION} \
-       couchbase==4.3.0
+       couchbase==4.3.2
 
 RUN curl -fsSL \
     "https://repo.maven.apache.org/maven2/org/apache/flink/flink-connector-kafka/${KAFKA_CONNECTOR_VERSION}/flink-connector-kafka-${KAFKA_CONNECTOR_VERSION}.jar" \
