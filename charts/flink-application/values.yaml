@@ -1,0 +1,58 @@
+nameOverride: equipment-agregate
+environment: lab
+tenant: 1l
+
+image:
+  repository: xlen911/application-mode
+  tag: v1.1.0
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+
+azure:
+  secretName: azure-secret-st-flinkdata
+  storageAccountName: "flinkstorage911"
+  haContainer: openshift-ha
+  checkpointContainer: flink-checkpoints
+  savepointContainer: flink-savepoints
+  basePath: flink/application-mode
+
+kafka:
+  bootstrapServers: "lab-kafka-kafka-bootstrap.kafka.svc:9092"
+  topic: equipment-events
+  groupId: equipment-agregate-lab
+
+couchbase:
+  sinkMode: console
+  connectionString: "couchbase://couchbase.couchbase.svc"
+  bucket: equipment
+  scope: _default
+  collection: events
+  credentialsSecret: couchbase-credentials
+
+flink:
+  taskSlots: 2
+  parallelism: 2
+  checkpointInterval: "30 s"
+  checkpointTimeout: "5 min"
+  checkpointMinPause: "5 s"
+  jobManager:
+    replicas: 2
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "1Gi"
+      limits:
+        cpu: "1"
+        memory: "2Gi"
+  taskManager:
+    resources:
+      requests:
+        cpu: "1"
+        memory: "2Gi"
+      limits:
+        cpu: "2"
+        memory: "3Gi"
+
+job:
+  pythonFile: /opt/flink/usrlib/equipment_agregate.py
+  pythonJar: local:///opt/flink/opt/flink-python-2.2.0.jar

@@ -1,0 +1,22 @@
+﻿flink-kubernetes-operator:
+  watchNamespaces: []
+  replicas: 1
+  rbac:
+    create: true
+  webhook:
+    create: true
+  # OpenShift SCC assigns an arbitrary UID; remove chart's fixed UID/GID.
+  podSecurityContext:
+    runAsUser: null
+    runAsGroup: null
+  operatorPod:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  defaultConfiguration:
+    create: true
+    append: true

@@ -1,0 +1,9 @@
+apiVersion: v2
+name: equipment-agregate-1l
+description: Tenant 1L release of the reusable Flink application chart
+type: application
+version: 0.1.0
+dependencies:
+  - name: flink-application
+    version: 0.1.0
+    repository: file://../../../charts/flink-application

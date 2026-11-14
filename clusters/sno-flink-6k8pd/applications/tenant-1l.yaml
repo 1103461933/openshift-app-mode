@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: equipment-agregate-1l
+  namespace: openshift-gitops
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/1103461933/openshift-app-mode.git
+    targetRevision: main
+    path: tenants/1l/equipment-agregate
+    helm:
+      releaseName: equipment-agregate
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openshift-bridge-1l
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: false
+    syncOptions:
+      - CreateNamespace=false

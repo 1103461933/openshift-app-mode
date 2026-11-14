@@ -1,0 +1,9 @@
+apiVersion: v2
+name: equipment-agregate-2l
+description: Tenant 2L overlay for future expansion; not deployed by this PoC
+type: application
+version: 0.1.0
+dependencies:
+  - name: flink-application
+    version: 0.1.0
+    repository: file://../../../charts/flink-application

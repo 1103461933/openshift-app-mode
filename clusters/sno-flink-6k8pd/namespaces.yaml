@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-bridge-1l
+  labels:
+    app.kubernetes.io/part-of: openshift-app-mode-lab
+    lab.xle2911.com/tenant: "1l"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-bridge-2l
+  labels:
+    app.kubernetes.io/part-of: openshift-app-mode-lab
+    lab.xle2911.com/tenant: "2l"

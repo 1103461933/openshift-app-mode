@@ -1,0 +1,107 @@
+{{- $storageAccount := required "Set azure.storageAccountName in tenant values.yaml or with --set." .Values.azure.storageAccountName -}}
+{{- $name := include "flink-application.fullname" . -}}
+{{- $base := printf "%s/%s/%s" .Values.azure.basePath .Values.environment .Values.tenant -}}
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  name: {{ $name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "flink-application.labels" . | nindent 4 }}
+spec:
+  mode: native
+  image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+  imagePullPolicy: {{ .Values.image.pullPolicy }}
+  flinkVersion: v2_2
+  serviceAccount: flink
+  flinkConfiguration:
+    jobmanager.rpc.port: "6123"
+    jobmanager.bind-host: "0.0.0.0"
+    blob.server.port: "6124"
+    rest.port: "8081"
+    rest.bind-address: "0.0.0.0"
+    taskmanager.numberOfTaskSlots: {{ .Values.flink.taskSlots | quote }}
+    state.backend.type: rocksdb
+    state.backend.rocksdb.localdir: /tmp/flink-rocksdb
+    execution.checkpointing.incremental: "true"
+    execution.checkpointing.interval: {{ .Values.flink.checkpointInterval | quote }}
+    execution.checkpointing.mode: EXACTLY_ONCE
+    execution.checkpointing.timeout: {{ .Values.flink.checkpointTimeout | quote }}
+    execution.checkpointing.min-pause: {{ .Values.flink.checkpointMinPause | quote }}
+    execution.checkpointing.externalized-checkpoint-retention: RETAIN_ON_CANCELLATION
+    execution.checkpointing.tolerable-failed-checkpoints: "3"
+    high-availability.type: kubernetes
+    high-availability.storageDir: {{ printf "abfs://%s@%s.dfs.core.windows.net/%s/ha" .Values.azure.haContainer $storageAccount $base | quote }}
+    state.checkpoints.dir: {{ printf "abfs://%s@%s.dfs.core.windows.net/%s/checkpoints" .Values.azure.checkpointContainer $storageAccount $base | quote }}
+    state.savepoints.dir: {{ printf "abfs://%s@%s.dfs.core.windows.net/%s/savepoints" .Values.azure.savepointContainer $storageAccount $base | quote }}
+    python.client.executable: /usr/bin/python3
+    python.executable: /usr/bin/python3
+    python.execution-mode: process
+    restart-strategy.type: fixed-delay
+    restart-strategy.fixed-delay.attempts: "10"
+    restart-strategy.fixed-delay.delay: "10 s"
+    kubernetes.env.secretKeyRef: {{ printf "env:AZURE_STORAGE_ACCOUNT_NAME,secret:%s,key:azurestorageaccountname;env:AZURE_STORAGE_ACCOUNT_KEY,secret:%s,key:azurestorageaccountkey" .Values.azure.secretName .Values.azure.secretName | quote }}
+  podTemplate:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ $name }}
+        lab.xle2911.com/tenant: {{ .Values.tenant | quote }}
+    spec:
+      {{- with .Values.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: flink-main-container
+          env:
+            # Docker entrypoint appends FLINK_PROPERTIES to config.yaml and expands env vars.
+            - name: FLINK_PROPERTIES
+              value: |-
+                fs.azure.account.auth.type.${AZURE_STORAGE_ACCOUNT_NAME}.dfs.core.windows.net: SharedKey
+                fs.azure.account.key.${AZURE_STORAGE_ACCOUNT_NAME}.dfs.core.windows.net: ${AZURE_STORAGE_ACCOUNT_KEY}
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: {{ .Values.kafka.bootstrapServers | quote }}
+            - name: KAFKA_TOPIC
+              value: {{ .Values.kafka.topic | quote }}
+            - name: KAFKA_GROUP_ID
+              value: {{ .Values.kafka.groupId | quote }}
+            - name: SINK_MODE
+              value: {{ .Values.couchbase.sinkMode | quote }}
+            - name: COUCHBASE_CONNECTION_STRING
+              value: {{ .Values.couchbase.connectionString | quote }}
+            - name: COUCHBASE_BUCKET
+              value: {{ .Values.couchbase.bucket | quote }}
+            - name: COUCHBASE_SCOPE
+              value: {{ .Values.couchbase.scope | quote }}
+            - name: COUCHBASE_COLLECTION
+              value: {{ .Values.couchbase.collection | quote }}
+            - name: COUCHBASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.couchbase.credentialsSecret }}
+                  key: username
+                  optional: true
+            - name: COUCHBASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.couchbase.credentialsSecret }}
+                  key: password
+                  optional: true
+  jobManager:
+    replicas: {{ .Values.flink.jobManager.replicas }}
+    resources:
+      {{- toYaml .Values.flink.jobManager.resources | nindent 6 }}
+  taskManager:
+    resources:
+      {{- toYaml .Values.flink.taskManager.resources | nindent 6 }}
+  job:
+    jarURI: {{ .Values.job.pythonJar | quote }}
+    entryClass: org.apache.flink.client.python.PythonDriver
+    args:
+      - "-pyclientexec"
+      - "/usr/bin/python3"
+      - "-py"
+      - {{ .Values.job.pythonFile | quote }}
+    parallelism: {{ .Values.flink.parallelism }}
+    upgradeMode: last-state
+    state: running

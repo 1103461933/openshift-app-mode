@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: openshift-app-mode-root
+  namespace: openshift-gitops
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/1103461933/openshift-app-mode.git
+    targetRevision: main
+    path: clusters/sno-flink-6k8pd
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openshift-gitops
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: false

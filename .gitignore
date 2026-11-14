@@ -17,3 +17,24 @@ __pycache__/
 *.pyc
 .vscode/
 .idea/
+
+# Local exports and inspection output
+crd-files-list.txt
+operator-chart-files.txt
+operator-crd-search.txt
+operator-deployment-security.txt
+operator-direct-preview*.yaml
+operator-packaged-crds.yaml
+operator-preview*.yaml
+operator-rendered*.yaml
+operator-show-crds.yaml
+subchart-crds.yaml
+
+# Temporary unpacked/downloaded Helm chart copies
+/temp-operator-chart/
+/temp-operator-chart-test/
+/temp-operator-chart-package/
+
+# Generated split manifests; keep yaml/split-yaml.py tracked
+/yaml/operator-resources/
+/yaml/operator-resources.zip
