@@ -13,9 +13,8 @@ RUN apt-get update \
 
 RUN ln -sf /usr/bin/python3 /usr/bin/python \
     && python3 -m pip install --no-cache-dir --break-system-packages \
-       --upgrade pip setuptools wheel \
-    && python3 -m pip install --no-cache-dir --break-system-packages \
        apache-flink==${FLINK_VERSION} \
+       --only-binary=couchbase \
        couchbase==4.3.2
 
 RUN curl -fsSL \
