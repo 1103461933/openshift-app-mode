@@ -1,0 +1,6 @@
+dependencies:
+- name: flink-application
+  repository: file://../../../charts/flink-application
+  version: 0.1.0
+digest: sha256:6cde6ce2d56d6f7fca3b261827ba42d00ee650da516702d2be9da33e75d9d5a8
+generated: "2026-11-18T15:39:31.8984815-05:00"
