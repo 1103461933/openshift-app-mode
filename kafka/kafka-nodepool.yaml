@@ -1,0 +1,28 @@
+
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaNodePool
+metadata:
+  name: lab-kafka
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: lab-kafka
+spec:
+  replicas: 1
+  roles:
+    - controller
+    - broker
+  storage:
+    type: persistent-claim
+    size: 10Gi
+    class: standard-csi
+    deleteClaim: false
+  resources:
+    requests:
+      memory: 768Mi
+      cpu: 200m
+    limits:
+      memory: 1Gi
+      cpu: 750m
+  jvmOptions:
+    -Xms: 256m
+    -Xmx: 384m

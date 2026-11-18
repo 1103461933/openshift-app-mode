@@ -34,7 +34,7 @@ flink-application:
     checkpointTimeout: "5 min"
     checkpointMinPause: "5 s"
     jobManager:
-      replicas: 2
+      replicas: 1
       resources:
         requests:
           cpu: "500m"

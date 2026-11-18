@@ -1,5 +1,7 @@
-﻿flink-kubernetes-operator:
-  watchNamespaces: []
+flink-kubernetes-operator:
+  watchNamespaces:
+    - openshift-bridge-1l
+    - openshift-bridge-2l
   replicas: 1
   rbac:
     create: true
