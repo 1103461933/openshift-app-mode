@@ -12,8 +12,8 @@ flink-application:
     storageAccountKeySecretName: flink-storage-credentials
     storageAccountName: "flinkstorage911"
     haContainer: openshift-ha
-    checkpointContainer: flink-checkpoints
-    savepointContainer: flink-savepoints
+    checkpointContainer: openshift-checkpoints
+    savepointContainer: openshift-savepoints
     basePath: flink/application-mode
   kafka:
     # Assumption for this PoC: Strimzi cluster lab-kafka in namespace kafka.
