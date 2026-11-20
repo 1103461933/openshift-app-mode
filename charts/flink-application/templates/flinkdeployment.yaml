@@ -13,6 +13,9 @@ spec:
   image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
   imagePullPolicy: {{ .Values.image.pullPolicy }}
   flinkVersion: v2_2
+  logConfiguration:
+    log4j-console.properties: |-
+      {{- .Files.Get "files/log4j-console.properties" | nindent 6 }}
   serviceAccount: flink
   flinkConfiguration:
     jobmanager.rpc.port: "6123"
@@ -41,8 +44,8 @@ spec:
     restart-strategy.fixed-delay.attempts: "10"
     restart-strategy.fixed-delay.delay: "10 s"
     kubernetes.env.secretKeyRef: {{ printf "env:AZURE_STORAGE_ACCOUNT_NAME,secret:%s,key:azurestorageaccountname;env:AZURE_STORAGE_ACCOUNT_KEY,secret:%s,key:storage-account-key" .Values.azure.secretName .Values.azure.storageAccountKeySecretName | quote }}
-    flink.hadoop.fs.azure.account.auth.type.flinkstorage911.dfs.core.windows.net: "SharedKey"
-    flink.hadoop.fs.azure.account.key.flinkstorage911.dfs.core.windows.net: "${env.AZURE_STORAGE_ACCOUNT_KEY}"
+    fs.azure.account.auth.type.flinkstorage911.dfs.core.windows.net: "SharedKey"
+    fs.azure.account.key.flinkstorage911.dfs.core.windows.net: "${env.AZURE_STORAGE_ACCOUNT_KEY}"
   podTemplate:
     metadata:
       labels:

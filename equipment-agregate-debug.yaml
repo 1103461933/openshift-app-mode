@@ -1,0 +1,114 @@
+---
+# Source: equipment-agregate-1l/charts/flink-application/templates/flinkdeployment.yaml
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  name: equipment-agregate
+  namespace: openshift-bridge-1l
+  labels:
+    app.kubernetes.io/name: equipment-agregate
+    app.kubernetes.io/instance: equipment-agregate
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/part-of: openshift-app-mode-lab
+    lab.xle2911.com/tenant: "1l"
+    lab.xle2911.com/environment: "lab"
+spec:
+  mode: native
+  image: "xlen911/application-mode:v1.1.3"
+  imagePullPolicy: IfNotPresent
+  flinkVersion: v2_2
+  serviceAccount: flink
+  flinkConfiguration:
+    jobmanager.rpc.port: "6123"
+    jobmanager.bind-host: "0.0.0.0"
+    blob.server.port: "6124"
+    rest.port: "8081"
+    rest.bind-address: "0.0.0.0"
+    taskmanager.numberOfTaskSlots: "2"
+    state.backend.type: rocksdb
+    state.backend.rocksdb.localdir: /tmp/flink-rocksdb
+    execution.checkpointing.incremental: "true"
+    execution.checkpointing.interval: "30 s"
+    execution.checkpointing.mode: EXACTLY_ONCE
+    execution.checkpointing.timeout: "5 min"
+    execution.checkpointing.min-pause: "5 s"
+    execution.checkpointing.externalized-checkpoint-retention: RETAIN_ON_CANCELLATION
+    execution.checkpointing.tolerable-failed-checkpoints: "3"
+    high-availability.type: kubernetes
+    state.checkpoints.dir: abfs://openshift-checkpoints@flinkstorage911.dfs.core.windows.net/flink/application-mode/lab/1l/checkpoints
+    state.savepoints.dir: abfs://openshift-savepoints@flinkstorage911.dfs.core.windows.net/flink/application-mode/lab/1l/savepoints
+    high-availability.storageDir: abfs://openshift-ha@flinkstorage911.dfs.core.windows.net/flink/application-mode/lab/1l/ha
+    python.client.executable: /usr/bin/python3
+    python.executable: /usr/bin/python3
+    python.execution-mode: process
+    restart-strategy.type: fixed-delay
+    restart-strategy.fixed-delay.attempts: "10"
+    restart-strategy.fixed-delay.delay: "10 s"
+    kubernetes.env.secretKeyRef: "env:AZURE_STORAGE_ACCOUNT_NAME,secret:azure-secret-st-flinkdata,key:azurestorageaccountname;env:AZURE_STORAGE_ACCOUNT_KEY,secret:flink-storage-credentials,key:storage-account-key"
+    flink.hadoop.fs.azure.account.auth.type.flinkstorage911.dfs.core.windows.net: "SharedKey"
+    flink.hadoop.fs.azure.account.key.flinkstorage911.dfs.core.windows.net: "${env.AZURE_STORAGE_ACCOUNT_KEY}"
+  podTemplate:
+    metadata:
+      labels:
+        app.kubernetes.io/name: equipment-agregate
+        lab.xle2911.com/tenant: "1l"
+    spec:
+      containers:
+        - name: flink-main-container
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "lab-kafka-kafka-bootstrap.kafka.svc:9092"
+            - name: KAFKA_TOPIC
+              value: "equipment-events"
+            - name: KAFKA_GROUP_ID
+              value: "equipment-agregate-1l"
+            - name: SINK_MODE
+              value: "console"
+            - name: COUCHBASE_CONNECTION_STRING
+              value: "couchbase://couchbase.couchbase.svc"
+            - name: COUCHBASE_BUCKET
+              value: "equipment"
+            - name: COUCHBASE_SCOPE
+              value: "_default"
+            - name: COUCHBASE_COLLECTION
+              value: "events"
+            - name: COUCHBASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: couchbase-credentials
+                  key: username
+                  optional: true
+            - name: COUCHBASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: couchbase-credentials
+                  key: password
+                  optional: true
+  jobManager:
+    replicas: 1
+    resources:
+      limits:
+        cpu: "1"
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+  taskManager:
+    resources:
+      limits:
+        cpu: "2"
+        memory: 3Gi
+      requests:
+        cpu: "1"
+        memory: 2Gi
+  job:
+    jarURI: "local:///opt/flink/opt/flink-python-2.2.0.jar"
+    entryClass: org.apache.flink.client.python.PythonDriver
+    args:
+      - "-pyclientexec"
+      - "/usr/bin/python3"
+      - "-py"
+      - "/opt/flink/usrlib/equipment_agregate.py"
+    parallelism: 2
+    upgradeMode: last-state
+    state: running
