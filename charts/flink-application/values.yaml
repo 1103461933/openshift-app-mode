@@ -10,6 +10,7 @@ image:
 
 azure:
   secretName: azure-secret-st-flinkdata
+  storageAccountKeySecretName: flink-storage-credentials
   storageAccountName: "flinkstorage911"
   haContainer: openshift-ha
   checkpointContainer: flink-checkpoints

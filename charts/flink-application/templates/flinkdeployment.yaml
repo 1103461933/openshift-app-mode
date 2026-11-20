@@ -40,7 +40,9 @@ spec:
     restart-strategy.type: fixed-delay
     restart-strategy.fixed-delay.attempts: "10"
     restart-strategy.fixed-delay.delay: "10 s"
-    kubernetes.env.secretKeyRef: {{ printf "env:AZURE_STORAGE_ACCOUNT_NAME,secret:%s,key:azurestorageaccountname;env:AZURE_STORAGE_ACCOUNT_KEY,secret:%s,key:azurestorageaccountkey" .Values.azure.secretName .Values.azure.secretName | quote }}
+    kubernetes.env.secretKeyRef: {{ printf "env:AZURE_STORAGE_ACCOUNT_NAME,secret:%s,key:azurestorageaccountname;env:AZURE_STORAGE_ACCOUNT_KEY,secret:%s,key:storage-account-key" .Values.azure.secretName .Values.azure.storageAccountKeySecretName | quote }}
+    flink.hadoop.fs.azure.account.auth.type.flinkstorage911.dfs.core.windows.net: "SharedKey"
+    flink.hadoop.fs.azure.account.key.flinkstorage911.dfs.core.windows.net: "${env.AZURE_STORAGE_ACCOUNT_KEY}"
   podTemplate:
     metadata:
       labels:
@@ -55,10 +57,6 @@ spec:
         - name: flink-main-container
           env:
             # Docker entrypoint appends FLINK_PROPERTIES to config.yaml and expands env vars.
-            - name: FLINK_PROPERTIES
-              value: |-
-                fs.azure.account.auth.type.${AZURE_STORAGE_ACCOUNT_NAME}.dfs.core.windows.net: SharedKey
-                fs.azure.account.key.${AZURE_STORAGE_ACCOUNT_NAME}.dfs.core.windows.net: ${AZURE_STORAGE_ACCOUNT_KEY}
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: {{ .Values.kafka.bootstrapServers | quote }}
             - name: KAFKA_TOPIC

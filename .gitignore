@@ -38,3 +38,5 @@ subchart-crds.yaml
 # Generated split manifests; keep yaml/split-yaml.py tracked
 /yaml/operator-resources/
 /yaml/operator-resources.zip
+
+service-principal.json
