@@ -5,7 +5,7 @@ import os
 from datetime import datetime, timezone
 
 from pyflink.common import Types, WatermarkStrategy
-from pyflink.common.state import ValueStateDescriptor
+from pyflink.datastream.state import ValueStateDescriptor
 from pyflink.common.serialization import SimpleStringSchema
 from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.datastream.connectors.kafka import KafkaSource, KafkaOffsetsInitializer
