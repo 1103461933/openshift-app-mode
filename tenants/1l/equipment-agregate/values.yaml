@@ -54,3 +54,4 @@ flink-application:
   job:
     pythonFile: /opt/flink/usrlib/equipment_agregate.py
     pythonJar: local:///opt/flink/opt/flink-python-2.2.0.jar
+
