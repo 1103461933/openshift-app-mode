@@ -4,7 +4,7 @@ flink-application:
   tenant: 1l
   image:
     repository: xlen911/application-mode
-    tag: v1.1.5
+    tag: v1.1.6
     pullPolicy: IfNotPresent
     pullSecrets: []
   azure:
