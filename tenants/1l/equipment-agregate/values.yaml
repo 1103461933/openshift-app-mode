@@ -25,10 +25,10 @@ flink-application:
     topic: equipment-events
     groupId: equipment-agregate-1l
   couchbase:
-    sinkMode: console
-    connectionString: "couchbase://couchbase.couchbase.svc"
+    sinkMode: couchbase
+    connectionString: "couchbase://equipment-couchbase-srv.couchbase.svc.cluster.local"
     bucket: equipment
-    scope: _default
+    scope: bridge
     collection: events
     credentialsSecret: couchbase-credentials
   flink:

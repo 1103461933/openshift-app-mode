@@ -111,9 +111,9 @@ spec:
     execution.checkpointing.externalized-checkpoint-retention: RETAIN_ON_CANCELLATION
     execution.checkpointing.tolerable-failed-checkpoints: "3"
     high-availability.type: kubernetes
-    state.checkpoints.dir: abfs://openshift-checkpoints@flinkstorage911.dfs.core.windows.net/flink/application-mode/lab/1l/checkpoints
-    state.savepoints.dir: abfs://openshift-savepoints@flinkstorage911.dfs.core.windows.net/flink/application-mode/lab/1l/savepoints
-    high-availability.storageDir: abfs://openshift-ha@flinkstorage911.dfs.core.windows.net/flink/application-mode/lab/1l/ha
+    state.checkpoints.dir: "abfs://openshift-checkpoints@flinkstorage911.dfs.core.windows.net/flink/application-mode/lab/1l/checkpoints/recovery-20261124/equipment-agregate"
+    state.savepoints.dir: "abfs://openshift-savepoints@flinkstorage911.dfs.core.windows.net/flink/application-mode/lab/1l/savepoints/recovery-20261124/equipment-agregate"
+    high-availability.storageDir: "abfs://openshift-ha@flinkstorage911.dfs.core.windows.net/flink/application-mode/lab/1l/ha/recovery-20261124/equipment-agregate"
     python.client.executable: /usr/bin/python3
     python.executable: /usr/bin/python3
     python.execution-mode: process
@@ -186,5 +186,5 @@ spec:
       - "-py"
       - "/opt/flink/usrlib/equipment_agregate.py"
     parallelism: 2
-    upgradeMode: last-state
+    upgradeMode: savepoint
     state: running

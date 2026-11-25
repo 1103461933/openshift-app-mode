@@ -1,0 +1,32 @@
+﻿apiVersion: couchbase.com/v2
+kind: CouchbaseCluster
+metadata:
+  name: equipment-couchbase
+  namespace: couchbase
+spec:
+  image: couchbase/server:8.0.2
+  security:
+    adminSecret: couchbase-admin-secret
+  servers:
+    - name: data
+      size: 1
+      services:
+        - data
+        - index
+        - query
+      volumeMounts:
+        default: pvc-default
+      resources:
+        requests:
+          cpu: 500m
+          memory: 4Gi
+  volumeClaimTemplates:
+    - metadata:
+        name: pvc-default
+      spec:
+        storageClassName: standard-csi
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
