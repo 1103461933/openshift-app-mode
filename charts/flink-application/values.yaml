@@ -37,7 +37,7 @@ flink:
   checkpointTimeout: "5 min"
   checkpointMinPause: "5 s"
   jobManager:
-    replicas: 2
+    replicas: 1
     resources:
       requests:
         cpu: "500m"
@@ -57,3 +57,5 @@ flink:
 job:
   pythonFile: /opt/flink/usrlib/equipment_agregate.py
   pythonJar: local:///opt/flink/opt/flink-python-2.2.0.jar
+  upgradeMode: last-state
+  state: running

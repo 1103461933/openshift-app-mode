@@ -1,0 +1,8 @@
+{
+  "spec": {
+    "job": {
+      "state": "suspended",
+      "upgradeMode": "savepoint"
+    }
+  }
+}

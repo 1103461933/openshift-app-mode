@@ -1,0 +1,9 @@
+{
+  "spec": {
+    "job": {
+      "initialSavepointPath": "abfs://openshift-savepoints@flinkstorage911.dfs.core.windows.net/flink/application-mode/lab/1l/savepoints/recovery-20261124/equipment-agregate/savepoint-fd0a24-97a47c1106d0",
+      "savepointRedeployNonce": 1,
+      "state": "suspended"
+    }
+  }
+}

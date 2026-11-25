@@ -103,5 +103,5 @@ spec:
       - "-py"
       - {{ .Values.job.pythonFile | quote }}
     parallelism: {{ .Values.flink.parallelism }}
-    upgradeMode: last-state
-    state: running
+    upgradeMode: {{ .Values.job.upgradeMode }}
+    state: {{ .Values.job.state }}

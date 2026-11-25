@@ -38,21 +38,19 @@ flink-application:
       replicas: 1
       resources:
         requests:
+          cpu: "100m"
+          memory: "768Mi"
+        limits:
           cpu: "500m"
           memory: "1Gi"
-        limits:
-          cpu: "1"
-          memory: "2Gi"
     taskManager:
       resources:
         requests:
           cpu: "1"
-          memory: "2Gi"
+          memory: "1536Mi"
         limits:
-          cpu: "2"
-          memory: "3Gi"
+          cpu: "1"
+          memory: "2Gi"
   job:
     pythonFile: /opt/flink/usrlib/equipment_agregate.py
     pythonJar: local:///opt/flink/opt/flink-python-2.2.0.jar
-
-
