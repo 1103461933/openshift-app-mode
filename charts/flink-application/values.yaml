@@ -1,3 +1,4 @@
+
 nameOverride: equipment-agregate
 environment: lab
 tenant: 1l
