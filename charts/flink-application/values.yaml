@@ -5,7 +5,7 @@ tenant: 1l
 
 image:
   repository: xlen911/application-mode
-  tag: v1.1.7
+  tag: v1.1.8
   pullPolicy: IfNotPresent
   pullSecrets: []
 
