@@ -15,6 +15,9 @@ flink-application:
     checkpointContainer: openshift-checkpoints
     savepointContainer: openshift-savepoints
     basePath: flink/application-mode
+    haStorageDir: "abfs://openshift-ha@flinkstorage911.dfs.core.windows.net/flink/application-mode/lab/1l/ha/recovery-20261124/equipment-agregate"
+    checkpointDir: "abfs://openshift-checkpoints@flinkstorage911.dfs.core.windows.net/flink/application-mode/lab/1l/checkpoints/recovery-20261124/equipment-agregate"
+    savepointDir: "abfs://openshift-savepoints@flinkstorage911.dfs.core.windows.net/flink/application-mode/lab/1l/savepoints/recovery-20261124/equipment-agregate"
   kafka:
     # Assumption for this PoC: Strimzi cluster lab-kafka in namespace kafka.
     # Replace only if your Kafka Service uses a different name/namespace.
@@ -54,3 +57,4 @@ flink-application:
   job:
     pythonFile: /opt/flink/usrlib/equipment_agregate.py
     pythonJar: local:///opt/flink/opt/flink-python-2.2.0.jar
+    upgradeMode: savepoint

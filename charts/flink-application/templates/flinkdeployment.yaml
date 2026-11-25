@@ -34,9 +34,9 @@ spec:
     execution.checkpointing.externalized-checkpoint-retention: RETAIN_ON_CANCELLATION
     execution.checkpointing.tolerable-failed-checkpoints: "3"
     high-availability.type: kubernetes
-    state.checkpoints.dir: abfs://openshift-checkpoints@flinkstorage911.dfs.core.windows.net/flink/application-mode/lab/1l/checkpoints
-    state.savepoints.dir: abfs://openshift-savepoints@flinkstorage911.dfs.core.windows.net/flink/application-mode/lab/1l/savepoints
-    high-availability.storageDir: abfs://openshift-ha@flinkstorage911.dfs.core.windows.net/flink/application-mode/lab/1l/ha
+    state.checkpoints.dir: {{ .Values.azure.checkpointDir | default (printf "abfs://%s@%s.dfs.core.windows.net/%s/checkpoints" .Values.azure.checkpointContainer .Values.azure.storageAccountName $base) | quote }}
+    state.savepoints.dir: {{ .Values.azure.savepointDir | default (printf "abfs://%s@%s.dfs.core.windows.net/%s/savepoints" .Values.azure.savepointContainer .Values.azure.storageAccountName $base) | quote }}
+    high-availability.storageDir: {{ .Values.azure.haStorageDir | default (printf "abfs://%s@%s.dfs.core.windows.net/%s/ha" .Values.azure.haContainer .Values.azure.storageAccountName $base) | quote }}
     python.client.executable: /usr/bin/python3
     python.executable: /usr/bin/python3
     python.execution-mode: process
