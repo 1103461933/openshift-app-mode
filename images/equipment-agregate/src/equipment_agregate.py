@@ -1,4 +1,3 @@
-
 import hashlib
 import json
 import logging
@@ -16,7 +15,10 @@ from pyflink.datastream.connectors.kafka import (
     KafkaSource,
     KafkaOffsetsInitializer,
 )
-from pyflink.datastream.functions import KeyedProcessFunction, SinkFunction
+from pyflink.datastream.functions import (
+    KeyedProcessFunction,
+    FlatMapFunction,
+)
 from pyflink.datastream.state import ValueStateDescriptor
 
 
@@ -103,7 +105,7 @@ class EquipmentCounter(KeyedProcessFunction):
         )
 
 
-class CouchbaseUpsertSink(SinkFunction):
+class CouchbaseUpsertFlatMap(FlatMapFunction):
     """
     Couchbase sink using the Python SDK.
 
@@ -201,7 +203,9 @@ class CouchbaseUpsertSink(SinkFunction):
 
             raise
 
-    def invoke(self, value, context):
+    def flat_map(self, value):
+        # This operator performs the Couchbase write as a side effect.
+        # It intentionally emits no downstream records.
         if self.collection is None:
             raise RuntimeError(
                 "Couchbase collection is not initialized"
@@ -248,13 +252,15 @@ class CouchbaseUpsertSink(SinkFunction):
                 document_id,
             )
 
+            # FlatMapFunction must return an iterable.
+            # The record has been written to Couchbase, so emit nothing.
+            return iter(())
+
         except Exception:
             LOG.exception(
                 "Couchbase document write failed"
             )
-
-            # Propagate the exception to Flink.
-            # Do not silently discard failed records.
+            # Propagate the exception to Flink; do not discard failed records.
             raise
 
     def close(self):
@@ -381,9 +387,15 @@ def main():
             os.getenv("COUCHBASE_COLLECTION", "_default"),
         )
 
-        processed.add_sink(
-            CouchbaseUpsertSink()
-        ).name("equipment-couchbase-upsert-sink")
+        (
+            processed
+            .flat_map(
+                CouchbaseUpsertFlatMap(),
+                output_type=Types.STRING(),
+            )
+            .print()
+            .name("equipment-couchbase-upsert-sink")
+        )
 
     elif sink_mode == "console":
 
